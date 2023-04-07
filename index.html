@@ -1,74 +1,84 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-      }
+<head>
+	<title>Scratch-off game</title>
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+			background: #eee;
+		}
+		canvas {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+		img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: auto;
+			object-fit: contain;
+			z-index: -1;
+			pointer-events: none;
+		}
+	</style>
+</head>
+<body>
+	<img src="https://i.imgur.com/MBzZlkT.jpg" alt="Scratch-off image">
+	<canvas id="canvas"></canvas>
 
-      #white-layer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        background-color: white;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-      }
+	<script>
+		window.addEventListener('load', function() {
+			const canvas = document.getElementById('canvas');
+			const context = canvas.getContext('2d');
 
-      #hidden-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        z-index: 2;
-        opacity: 0;
-        transition: opacity 1s ease-in-out;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="white-layer"></div>
-    <img id="hidden-image" src="https://picsum.photos/id/237/800/800" />
-    <script>
-      const whiteLayer = document.querySelector("#white-layer");
-      const hiddenImage = document.querySelector("#hidden-image");
-      const mousePos = { x: 0, y: 0 };
-      const brushSize = 30;
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
 
-      whiteLayer.addEventListener("mousedown", function (e) {
-        e.preventDefault();
-        mousePos.x = e.clientX;
-        mousePos.y = e.clientY;
-        whiteLayer.style.clipPath = `circle(${brushSize / 2}px at ${mousePos.x}px ${mousePos.y}px)`;
-        whiteLayer.addEventListener("mousemove", scratchOff);
-      });
+			// Create a white layer over the image
+			context.fillStyle = '#fff';
+			context.fillRect(0, 0, canvas.width, canvas.height);
 
-      whiteLayer.addEventListener("mouseup", function (e) {
-        whiteLayer.removeEventListener("mousemove", scratchOff);
-      });
+			let isDrawing = false;
 
-      function scratchOff(e) {
-        const dx = e.clientX - mousePos.x;
-        const dy = e.clientY - mousePos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+			// When mouse is pressed down, set isDrawing to true and start drawing on the canvas
+			canvas.addEventListener('mousedown', function(event) {
+				isDrawing = true;
+				draw(event.clientX, event.clientY);
+			});
 
-        if (distance < brushSize) {
-          const opacity = (brushSize - distance) / brushSize;
-          const x = e.clientX - brushSize / 2;
-          const y = e.clientY - brushSize / 2;
+			// When mouse is moved and isDrawing is true, draw on the canvas
+			canvas.addEventListener('mousemove', function(event) {
+				if (isDrawing) {
+					draw(event.clientX, event.clientY);
+				}
+			});
 
-          whiteLayer.style.clipPath = `circle(${brushSize / 2}px at ${x}px ${y}px)`;
-          hiddenImage.style.opacity = 1 - opacity;
-        }
+			// When mouse is released, set isDrawing to false
+			canvas.addEventListener('mouseup', function(event) {
+				isDrawing = false;
+			});
 
-        mousePos.x = e.clientX;
-        mousePos.y = e.clientY;
-      }
-    </script>
-  </body>
+			function draw(x, y) {
+				// Calculate the size of the brush and draw a circle
+				const brushSize = 20;
+				context.beginPath();
+				context.arc(x, y, brushSize, 0, Math.PI * 2, true);
+				context.closePath();
+				context.fillStyle = '#fff';
+				context.fill('evenodd');
+
+				// Remove the white layer at the circle's position
+				context.globalCompositeOperation = 'destination-out';
+				context.beginPath();
+				context.arc(x, y, brushSize - 5, 0, Math.PI * 2, true);
+				context.closePath();
+				context.fillStyle = '#000';
+				context.fill();
+			}
+		});
+	</script>
+</body>
 </html>
