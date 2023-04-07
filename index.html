@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hidden Image</title>
+  <style>
+    /* CSS to create the white layer */
+    #white-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      z-index: 100;
+    }
+    
+    /* CSS to position the image */
+    #hidden-image {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 50;
+    }
+  </style>
+</head>
+<body>
+  <div id="white-layer"></div>
+  <img id="hidden-image" src="https://picsum.photos/400">
+  <script>
+    // Get the white layer and hidden image elements
+    var whiteLayer = document.getElementById("white-layer");
+    var hiddenImage = document.getElementById("hidden-image");
+
+    // Add an event listener to the white layer for mouse clicks and drags
+    whiteLayer.addEventListener("mousedown", function(e) {
+      // Prevent the default mouse down behavior to avoid selecting text
+      e.preventDefault();
+      
+      // Get the initial mouse position and image position
+      var initialMouseX = e.clientX;
+      var initialMouseY = e.clientY;
+      var initialImageX = parseInt(hiddenImage.style.left);
+      var initialImageY = parseInt(hiddenImage.style.top);
+
+      // Add event listeners for mouse move and up events
+      document.addEventListener("mousemove", moveImage);
+      document.addEventListener("mouseup", releaseImage);
+
+      // Function to move the image with the mouse
+      function moveImage(e) {
+        // Calculate the new image position based on the mouse movement
+        var newImageX = initialImageX + (e.clientX - initialMouseX);
+        var newImageY = initialImageY + (e.clientY - initialMouseY);
+
+        // Set the new image position
+        hiddenImage.style.left = newImageX + "px";
+        hiddenImage.style.top = newImageY + "px";
+      }
+
+      // Function to release the image when the mouse is released
+      function releaseImage() {
+        // Remove the mouse move and up event listeners
+        document.removeEventListener("mousemove", moveImage);
+        document.removeEventListener("mouseup", releaseImage);
+      }
+    });
+  </script>
+</body>
+</html>
