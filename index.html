@@ -21,6 +21,8 @@
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 50;
+      opacity: 0;
+      transition: opacity 0.5s;
     }
   </style>
 </head>
@@ -32,38 +34,10 @@
     var whiteLayer = document.getElementById("white-layer");
     var hiddenImage = document.getElementById("hidden-image");
 
-    // Add an event listener to the white layer for mouse clicks and drags
-    whiteLayer.addEventListener("mousedown", function(e) {
-      // Prevent the default mouse down behavior to avoid selecting text
-      e.preventDefault();
-      
-      // Get the initial mouse position and image position
-      var initialMouseX = e.clientX;
-      var initialMouseY = e.clientY;
-      var initialImageX = parseInt(hiddenImage.style.left);
-      var initialImageY = parseInt(hiddenImage.style.top);
-
-      // Add event listeners for mouse move and up events
-      document.addEventListener("mousemove", moveImage);
-      document.addEventListener("mouseup", releaseImage);
-
-      // Function to move the image with the mouse
-      function moveImage(e) {
-        // Calculate the new image position based on the mouse movement
-        var newImageX = initialImageX + (e.clientX - initialMouseX);
-        var newImageY = initialImageY + (e.clientY - initialMouseY);
-
-        // Set the new image position
-        hiddenImage.style.left = newImageX + "px";
-        hiddenImage.style.top = newImageY + "px";
-      }
-
-      // Function to release the image when the mouse is released
-      function releaseImage() {
-        // Remove the mouse move and up event listeners
-        document.removeEventListener("mousemove", moveImage);
-        document.removeEventListener("mouseup", releaseImage);
-      }
+    // Add an event listener to the white layer for mouse clicks
+    whiteLayer.addEventListener("click", function(e) {
+      // Set the hidden image opacity to 1 to reveal it
+      hiddenImage.style.opacity = 1;
     });
   </script>
 </body>
