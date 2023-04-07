@@ -1,65 +1,67 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Scratch Off Game</title>
-	<style>
-		canvas {
-			position: absolute;
-			top: 0;
-			left: 0;
-		}
-	</style>
-</head>
-<body>
-	<img id="image" src="" style="display:none;">
-	<canvas id="canvas"></canvas>
-	<script>
-		// Randomly select an image from Lorem Picsum
-		const width = window.innerWidth;
-		const height = window.innerHeight;
-		const img = document.getElementById('image');
-		img.src = `https://picsum.photos/${width}/${height}/?random`;
-		
-		// Initialize canvas
-		const canvas = document.getElementById('canvas');
-		canvas.width = width;
-		canvas.height = height;
-		const ctx = canvas.getContext('2d');
-		
-		// Set up brush size and color
-		let brushSize = 50;
-		ctx.fillStyle = '#FFFFFF';
-		
-		// Draw the white layer
-		ctx.fillRect(0, 0, width, height);
-		
-		// Set up mouse events
-		let isDrawing = false;
-		canvas.addEventListener('mousedown', startDrawing);
-		canvas.addEventListener('mouseup', stopDrawing);
-		canvas.addEventListener('mousemove', draw);
-		
-		// Handle brush stroke start
-		function startDrawing(e) {
-			isDrawing = true;
-			draw(e);
-		}
-		
-		// Handle brush stroke end
-		function stopDrawing() {
-			isDrawing = false;
-		}
-		
-		// Handle brush stroke drawing
-		function draw(e) {
-			if (!isDrawing) return;
-			ctx.globalCompositeOperation = 'destination-out';
-			const x = e.clientX;
-			const y = e.clientY;
-			ctx.beginPath();
-			ctx.arc(x, y, brushSize, 0, 2 * Math.PI);
-			ctx.fill();
-		}
-	</script>
-</body>
-</html>
+<?php
+// Get a random image URL from Lorem Picsum
+$imageUrl = 'https://picsum.photos/800/600';
+
+// Set the brush size for the scratch-off effect
+$brushSize = 50;
+
+// Generate the CSS for the scratch-off layer
+$css = "
+    .scratch {
+        position: relative;
+        width: 800px;
+        height: 600px;
+        background: url('$imageUrl');
+    }
+    .scratch-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        mix-blend-mode: multiply;
+        z-index: 10;
+    }
+";
+
+// Generate the HTML for the scratch-off game
+$html = "
+    <div class='scratch'>
+        <div class='scratch-layer'></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var isMouseDown = false;
+            var brush = document.createElement('div');
+            brush.style.position = 'absolute';
+            brush.style.width = '$brushSize' + 'px';
+            brush.style.height = '$brushSize' + 'px';
+            brush.style.borderRadius = '50%';
+            brush.style.background = '#fff';
+            brush.style.mixBlendMode = 'erase';
+            brush.style.zIndex = '20';
+            brush.style.pointerEvents = 'none';
+            document.querySelector('.scratch').addEventListener('mousedown', function(event) {
+                isMouseDown = true;
+                brush.style.top = event.offsetY - ($brushSize / 2) + 'px';
+                brush.style.left = event.offsetX - ($brushSize / 2) + 'px';
+                document.querySelector('.scratch').appendChild(brush);
+            });
+            document.querySelector('.scratch').addEventListener('mousemove', function(event) {
+                if (isMouseDown) {
+                    brush.style.top = event.offsetY - ($brushSize / 2) + 'px';
+                    brush.style.left = event.offsetX - ($brushSize / 2) + 'px';
+                }
+            });
+            document.querySelector('.scratch').addEventListener('mouseup', function(event) {
+                isMouseDown = false;
+            });
+        });
+    </script>
+";
+
+// Output the HTML and CSS
+echo "<style>$css</style>";
+echo $html;
+?>
