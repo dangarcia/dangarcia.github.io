@@ -1,67 +1,84 @@
-<?php
-// Get a random image URL from Lorem Picsum
-$imageUrl = 'https://picsum.photos/800/600';
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Scratch-off game</title>
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+			background: #eee;
+		}
+		canvas {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+		img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: auto;
+			object-fit: contain;
+			z-index: -1;
+			pointer-events: none;
+		}
+	</style>
+</head>
+<body>
+	<img src="https://picsum.photos/800/600" alt="Scratch-off image">
+	<canvas id="canvas"></canvas>
 
-// Set the brush size for the scratch-off effect
-$brushSize = 50;
+	<script>
+		window.addEventListener('load', function() {
+			const canvas = document.getElementById('canvas');
+			const context = canvas.getContext('2d');
 
-// Generate the CSS for the scratch-off layer
-$css = "
-    .scratch {
-        position: relative;
-        width: 800px;
-        height: 600px;
-        background: url('$imageUrl');
-    }
-    .scratch-layer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #fff;
-        mix-blend-mode: multiply;
-        z-index: 10;
-    }
-";
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
 
-// Generate the HTML for the scratch-off game
-$html = "
-    <div class='scratch'>
-        <div class='scratch-layer'></div>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var isMouseDown = false;
-            var brush = document.createElement('div');
-            brush.style.position = 'absolute';
-            brush.style.width = '$brushSize' + 'px';
-            brush.style.height = '$brushSize' + 'px';
-            brush.style.borderRadius = '50%';
-            brush.style.background = '#fff';
-            brush.style.mixBlendMode = 'erase';
-            brush.style.zIndex = '20';
-            brush.style.pointerEvents = 'none';
-            document.querySelector('.scratch').addEventListener('mousedown', function(event) {
-                isMouseDown = true;
-                brush.style.top = event.offsetY - ($brushSize / 2) + 'px';
-                brush.style.left = event.offsetX - ($brushSize / 2) + 'px';
-                document.querySelector('.scratch').appendChild(brush);
-            });
-            document.querySelector('.scratch').addEventListener('mousemove', function(event) {
-                if (isMouseDown) {
-                    brush.style.top = event.offsetY - ($brushSize / 2) + 'px';
-                    brush.style.left = event.offsetX - ($brushSize / 2) + 'px';
-                }
-            });
-            document.querySelector('.scratch').addEventListener('mouseup', function(event) {
-                isMouseDown = false;
-            });
-        });
-    </script>
-";
+			// Create a white layer over the image
+			context.fillStyle = '#fff';
+			context.fillRect(0, 0, canvas.width, canvas.height);
 
-// Output the HTML and CSS
-echo "<style>$css</style>";
-echo $html;
-?>
+			let isDrawing = false;
+
+			// When mouse is pressed down, set isDrawing to true and start drawing on the canvas
+			canvas.addEventListener('mousedown', function(event) {
+				isDrawing = true;
+				draw(event.clientX, event.clientY);
+			});
+
+			// When mouse is moved and isDrawing is true, draw on the canvas
+			canvas.addEventListener('mousemove', function(event) {
+				if (isDrawing) {
+					draw(event.clientX, event.clientY);
+				}
+			});
+
+			// When mouse is released, set isDrawing to false
+			canvas.addEventListener('mouseup', function(event) {
+				isDrawing = false;
+			});
+
+			function draw(x, y) {
+				// Calculate the size of the brush and draw a circle
+				const brushSize = 20;
+				context.beginPath();
+				context.arc(x, y, brushSize, 0, Math.PI * 2, true);
+				context.closePath();
+				context.fillStyle = '#fff';
+				context.fill('evenodd');
+
+				// Remove the white layer at the circle's position
+				context.globalCompositeOperation = 'destination-out';
+				context.beginPath();
+				context.arc(x, y, brushSize - 5, 0, Math.PI * 2, true);
+				context.closePath();
+				context.fillStyle = '#000';
+				context.fill();
+			}
+		});
+	</script>
+</body>
+</html>
