@@ -26,6 +26,8 @@
         height: 100%;
         object-fit: cover;
         z-index: 2;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
       }
     </style>
   </head>
@@ -42,6 +44,7 @@
         e.preventDefault();
         mousePos.x = e.clientX;
         mousePos.y = e.clientY;
+        hiddenImage.style.opacity = 1;
         whiteLayer.addEventListener("mousemove", scratchOff);
       });
 
