@@ -26,8 +26,6 @@
         height: 100%;
         object-fit: cover;
         z-index: 2;
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
       }
     </style>
   </head>
@@ -44,7 +42,7 @@
         e.preventDefault();
         mousePos.x = e.clientX;
         mousePos.y = e.clientY;
-        hiddenImage.style.opacity = 1;
+        whiteLayer.style.clipPath = `circle(${brushSize / 2}px at ${mousePos.x}px ${mousePos.y}px)`;
         whiteLayer.addEventListener("mousemove", scratchOff);
       });
 
