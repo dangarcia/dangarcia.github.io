@@ -45,6 +45,7 @@
 
     // Add an event listener to the white layer for mouse down
     whiteLayer.addEventListener("mousedown", function(e) {
+      e.preventDefault(); // prevent default drag and drop behavior
       // Store the current mouse position
       mousePos.x = e.clientX;
       mousePos.y = e.clientY;
