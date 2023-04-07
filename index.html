@@ -1,83 +1,71 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Scratch Off Game</title>
-  <style>
-    /* CSS to create the white layer */
-    #white-layer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: white;
-      z-index: 10;
-    }
-    
-    /* CSS to position the image */
-    #hidden-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 20;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
-  </style>
-</head>
-<body>
-  <div id="white-layer"></div>
-  <img id="hidden-image" src="https://picsum.photos/400">
-  <script>
-    // Get the white layer and hidden image elements
-    var whiteLayer = document.getElementById("white-layer");
-    var hiddenImage = document.getElementById("hidden-image");
+  <head>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
 
-    // Store the current mouse position
-    var mousePos = { x: 0, y: 0 };
+      #white-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: white;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
 
-    // Set the size of the scratch area
-    var scratchWidth = 50;
-    var scratchHeight = 50;
+      #hidden-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="white-layer"></div>
+    <img id="hidden-image" src="https://picsum.photos/id/237/800/800" />
+    <script>
+      const whiteLayer = document.querySelector("#white-layer");
+      const hiddenImage = document.querySelector("#hidden-image");
+      const mousePos = { x: 0, y: 0 };
+      const brushSize = 30;
 
-    // Add an event listener to the white layer for mouse down
-    whiteLayer.addEventListener("mousedown", function(e) {
-      e.preventDefault(); // prevent default drag and drop behavior
-      // Store the current mouse position
-      mousePos.x = e.clientX;
-      mousePos.y = e.clientY;
+      whiteLayer.addEventListener("mousedown", function (e) {
+        e.preventDefault();
+        mousePos.x = e.clientX;
+        mousePos.y = e.clientY;
+        whiteLayer.addEventListener("mousemove", scratchOff);
+      });
 
-      // Set the hidden image opacity to 1 to reveal it
-      hiddenImage.style.opacity = 1;
+      whiteLayer.addEventListener("mouseup", function (e) {
+        whiteLayer.removeEventListener("mousemove", scratchOff);
+      });
 
-      // Add an event listener to the white layer for mouse move
-      whiteLayer.addEventListener("mousemove", scratchOff);
-    });
+      function scratchOff(e) {
+        const dx = e.clientX - mousePos.x;
+        const dy = e.clientY - mousePos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // Add an event listener to the white layer for mouse up
-    whiteLayer.addEventListener("mouseup", function(e) {
-      // Remove the mouse move event listener
-      whiteLayer.removeEventListener("mousemove", scratchOff);
-    });
+        if (distance < brushSize) {
+          const opacity = (brushSize - distance) / brushSize;
+          const x = e.clientX - brushSize / 2;
+          const y = e.clientY - brushSize / 2;
 
-    // Function to scratch off the white layer
-    function scratchOff(e) {
-      // Calculate the amount to reveal based on the mouse movement
-      var deltaX = Math.abs(e.clientX - mousePos.x);
-      var deltaY = Math.abs(e.clientY - mousePos.y);
-      var revealX = (deltaX / scratchWidth) * 100;
-      var revealY = (deltaY / scratchHeight) * 100;
+          whiteLayer.style.clipPath = `circle(${brushSize / 2}px at ${x}px ${y}px)`;
+          hiddenImage.style.opacity = 1 - opacity;
+        }
 
-      // Update the CSS clip property of the white layer
-      var clipValue = "rect(" + revealY + "%, " + (100 - revealX) + "%, " + (100 - revealY) + "%, " + revealX + "%)";
-      whiteLayer.style.clip = clipValue;
-
-      // Stop the event from propagating
-      e.stopPropagation();
-    }
-  </script>
-</body>
+        mousePos.x = e.clientX;
+        mousePos.y = e.clientY;
+      }
+    </script>
+  </body>
 </html>
