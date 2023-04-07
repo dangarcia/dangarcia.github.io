@@ -3,70 +3,63 @@
 <head>
 	<title>Scratch Off Game</title>
 	<style>
-		body {
-			margin: 0;
-			padding: 0;
-			background-color: #333;
-		}
-
-		#container {
-			position: relative;
-			width: 100%;
-			height: 100vh;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			overflow: hidden;
-		}
-
-		#image {
+		canvas {
 			position: absolute;
 			top: 0;
 			left: 0;
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			opacity: 0.2;
-		}
-
-		#overlay {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-color: white;
-			z-index: 1;
 		}
 	</style>
 </head>
 <body>
-	<div id="container">
-		<img id="image" src="https://picsum.photos/800/800" />
-		<div id="overlay"></div>
-	</div>
-
+	<img id="image" src="" style="display:none;">
+	<canvas id="canvas"></canvas>
 	<script>
-		const container = document.getElementById("container");
-		const overlay = document.getElementById("overlay");
+		// Randomly select an image from Lorem Picsum
+		const width = window.innerWidth;
+		const height = window.innerHeight;
+		const img = document.getElementById('image');
+		img.src = `https://picsum.photos/${width}/${height}/?random`;
+		
+		// Initialize canvas
+		const canvas = document.getElementById('canvas');
+		canvas.width = width;
+		canvas.height = height;
+		const ctx = canvas.getContext('2d');
+		
+		// Set up brush size and color
+		let brushSize = 50;
+		ctx.fillStyle = '#FFFFFF';
+		
+		// Draw the white layer
+		ctx.fillRect(0, 0, width, height);
+		
+		// Set up mouse events
 		let isDrawing = false;
-
-		container.addEventListener("mousedown", () => {
+		canvas.addEventListener('mousedown', startDrawing);
+		canvas.addEventListener('mouseup', stopDrawing);
+		canvas.addEventListener('mousemove', draw);
+		
+		// Handle brush stroke start
+		function startDrawing(e) {
 			isDrawing = true;
-			overlay.style.zIndex = -1;
-		});
-
-		container.addEventListener("mousemove", (event) => {
-			if (isDrawing) {
-				const x = event.clientX - container.offsetLeft;
-				const y = event.clientY - container.offsetTop;
-				overlay.style.background = `radial-gradient(circle at ${x}px ${y}px, transparent 20px, white 30px)`;
-			}
-		});
-
-		container.addEventListener("mouseup", () => {
+			draw(e);
+		}
+		
+		// Handle brush stroke end
+		function stopDrawing() {
 			isDrawing = false;
-		});
+		}
+		
+		// Handle brush stroke drawing
+		function draw(e) {
+			if (!isDrawing) return;
+			ctx.globalCompositeOperation = 'destination-out';
+			const x = e.clientX;
+			const y = e.clientY;
+			ctx.beginPath();
+			ctx.arc(x, y, brushSize, 0, 2 * Math.PI);
+			ctx.fill();
+		}
 	</script>
 </body>
 </html>
