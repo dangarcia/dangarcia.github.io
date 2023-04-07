@@ -1,83 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Scratch-off game</title>
-	<style type="text/css">
+	<title>Scratch Off Game</title>
+	<style>
 		body {
 			margin: 0;
 			padding: 0;
-			background: #eee;
+			background-color: #333;
 		}
-		canvas {
-			position: absolute;
-			top: 0;
-			left: 0;
+
+		#container {
+			position: relative;
+			width: 100%;
+			height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
 		}
-		img {
+
+		#image {
 			position: absolute;
 			top: 0;
 			left: 0;
 			width: 100%;
-			height: auto;
-			object-fit: contain;
-			z-index: -1;
-			pointer-events: none;
+			height: 100%;
+			object-fit: cover;
+			opacity: 0.2;
+		}
+
+		#overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: white;
+			z-index: 1;
 		}
 	</style>
 </head>
 <body>
-	<img src="https://i.imgur.com/MBzZlkT.jpg" alt="Scratch-off image">
-	<canvas id="canvas"></canvas>
+	<div id="container">
+		<img id="image" src="https://picsum.photos/id/237/800/800" />
+		<div id="overlay"></div>
+	</div>
 
 	<script>
-		window.addEventListener('load', function() {
-			const canvas = document.getElementById('canvas');
-			const context = canvas.getContext('2d');
+		const container = document.getElementById("container");
+		const overlay = document.getElementById("overlay");
+		let isDrawing = false;
 
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
+		container.addEventListener("mousedown", () => {
+			isDrawing = true;
+			overlay.style.zIndex = -1;
+		});
 
-			// Create a white layer over the image
-			context.fillStyle = '#fff';
-			context.fillRect(0, 0, canvas.width, canvas.height);
-
-			let isDrawing = false;
-
-			// When mouse is pressed down, set isDrawing to true and start drawing on the canvas
-			canvas.addEventListener('mousedown', function(event) {
-				isDrawing = true;
-				draw(event.clientX, event.clientY);
-			});
-
-			// When mouse is moved and isDrawing is true, draw on the canvas
-			canvas.addEventListener('mousemove', function(event) {
-				if (isDrawing) {
-					draw(event.clientX, event.clientY);
-				}
-			});
-
-			// When mouse is released, set isDrawing to false
-			canvas.addEventListener('mouseup', function(event) {
-				isDrawing = false;
-			});
-
-			function draw(x, y) {
-				// Calculate the size of the brush and draw a circle
-				const brushSize = 20;
-				context.beginPath();
-				context.arc(x, y, brushSize, 0, Math.PI * 2, true);
-				context.closePath();
-				context.fillStyle = '#fff';
-				context.fill('evenodd');
-
-				// Remove the white layer at the circle's position
-				context.globalCompositeOperation = 'destination-out';
-				context.beginPath();
-				context.arc(x, y, brushSize - 5, 0, Math.PI * 2, true);
-				context.closePath();
-				context.fillStyle = '#000';
-				context.fill();
+		container.addEventListener("mousemove", (event) => {
+			if (isDrawing) {
+				const x = event.clientX - container.offsetLeft;
+				const y = event.clientY - container.offsetTop;
+				overlay.style.background = `radial-gradient(circle at ${x}px ${y}px, transparent 20px, white 30px)`;
 			}
+		});
+
+		container.addEventListener("mouseup", () => {
+			isDrawing = false;
 		});
 	</script>
 </body>
